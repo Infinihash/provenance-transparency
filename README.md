@@ -8,7 +8,7 @@
 
 ---
 
-Proposal, Oct 22, 2026. Built on `research_open_safety_landscape.md` and `research_open_safety_models.md` (read their [V]/[M]/[B] markers: several funding and legal claims there are from memory and need checking before anything is said publicly).
+Proposal, Oct 22, 2026. Built on two research notes in this repository: [research/landscape.md](research/landscape.md) (who sells crypto safety data, and what the free lists did) and [research/models.md](research/models.md) (how other industries made abuse data a public good). Both mark each claim [V] verified, [M] from memory or [B] background knowledge. Several funding and legal figures are [M]/[B]: treat them as leads to check, not facts, and tell us where they are wrong.
 
 ## 1. The problem, stated precisely
 
@@ -56,7 +56,7 @@ Rule of thumb from Spamhaus and HIBP: free for the people being protected, paid 
 
 ## 7. What Infinihash's role would be
 
-Reference implementation and first issuer (the EAS schema and propagation engine in `provenance_attestations.md` are 80% of it), first commercial enrichment vendor on top, and the convener of the first two outside operators. Not the sole operator and not the owner: the moment one company owns the log, it's a paywall waiting to happen.
+Reference implementation and first issuer, first commercial enrichment vendor on top, and the convener of the first two outside operators. Not the sole operator and not the owner: the moment one company owns the log, it's a paywall waiting to happen.
 
 ## 8. Bootstrap (90 days)
 
@@ -68,7 +68,7 @@ Reference implementation and first issuer (the EAS schema and propagation engine
 
 ## 9. Open questions (check before any public claim)
 
-- Verify the funding figures and licence terms marked [M]/[B] in the two research files.
+- Verify the funding figures and licence terms marked [M]/[B] in [research/](research/).
 - Whether the US CISA 2015 sharing safe harbour was reauthorised after its Sept 2025 lapse, and the CVE contract status after March 2026.
 - The exact EDPB wording on wallet addresses as personal data, and what an erasure process must look like.
 - Whether a recovery pledge can be structured without becoming a "recovery service" in the regulatory sense; counsel to design it.
