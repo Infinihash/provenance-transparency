@@ -1,5 +1,13 @@
 # Provenance Transparency: crypto safety data without a paywall
 
+**Status:** request for comment, v0.1 (October 2026). Comments are open until 30 November 2026 in this repository's Discussions, or by email to hello@infinihash.com. A revised v0.2 will say what changed, why, and who argued for it.
+
+**Read:** the [web page](https://kyt.infinihash.com/provenance) · the [one-page brief (PDF)](onepager.pdf) · this document, the full proposal.
+
+**Licence:** the text is CC BY 4.0 (see LICENSE). Quote it, adapt it, argue with it.
+
+---
+
 Proposal, Oct 22, 2026. Built on `research_open_safety_landscape.md` and `research_open_safety_models.md` (read their [V]/[M]/[B] markers: several funding and legal claims there are from memory and need checking before anything is said publicly).
 
 ## 1. The problem, stated precisely
