@@ -1,6 +1,6 @@
 # Provenance Transparency: crypto safety data without a paywall
 
-**Status:** request for comment, v0.2 draft (October 2026). Comments are open until 30 November 2026 in this repository's Discussions, or by email to hello@infinihash.com. A revised v0.2 will say what changed, why, and who argued for it.
+**Status:** request for comment, v0.3 draft (October 2026). Comments are open until 30 November 2026 in this repository's Discussions, or by email to hello@infinihash.com. A revised Each revision will say what changed, why, and who argued for it.
 
 **Read:** the [web page](https://kyt.infinihash.com/provenance) · the [one-page brief (PDF)](onepager.pdf) · this document, the full proposal.
 
@@ -36,6 +36,14 @@ So the people transacting are increasingly transacting with each other, not with
 
 Spam blocklists, breach-notification services, certificate transparency, CVE: each publishes the evidence for free and lets a market sell the judgment on top. Crypto does it backwards. It sells the evidence. This proposal turns it the right way round.
 
+### What exists already, and what this adds
+
+Public scam reporting exists. Chainabuse takes reports from anyone and is read widely. The Security Alliance's sharing networks move warnings between security teams quickly. Exchange and vendor lists are deep and well funded. None of that is dismissed here; the log is designed to sit underneath all of it.
+
+What none of them provides: a claim that is signed by an accountable issuer, tied to hashes of the evidence behind it, entered in a public record that no operator can quietly edit, with a dispute process whose outcome is as public as the claim, and an erasure path for the person who was wrongly named by circumstance. Reports can be anonymous and are hard to test. Membership lists are closed. Vendor lists are products. A fact that a victim's counsel needs to rely on, in front of a court, has to be attributable, evidenced and correctable in public. That is the gap this proposal fills, and it is a narrow one on purpose.
+
+Operators of existing services are invited to mirror the log and to file to it. If the record becomes substrate for the tools people already use, it has done its job.
+
 ## Part 2 · How
 
 Split the data in two. The **facts** go in a public, append-only log that anyone can read for free, forever. The **judgments** stay with whoever is making the decision: the wallet, the exchange, the vendor. The log never says "bad wallet". It says "funds from this transaction are proceeds of this incident, here is the evidence, here is who says so and how sure they are." Everything below is a consequence of that split.
@@ -56,7 +64,7 @@ Split the data in two. The **facts** go in a public, append-only log that anyone
 ### How a fact gets out
 
 1. **Wallets look up by hash prefix.** A wallet about to sign sends the first bytes of a hash of the destination address, gets back the matching bucket, checks locally. The log never learns which address was queried. Free at consumer volume; a paid tier for heavy commercial use.
-2. **The wallet applies its own policy.** The log returns claims, not verdicts. The wallet decides what to show. The policy, and the liability for it, sits with the wallet. That is the legal shield.
+2. **The wallet applies its own policy.** The log returns claims, not verdicts. The wallet decides what to show. The policy sits with the wallet, and so does liability for the warning it chooses to show. The split does not make the log liability-free, and it is not presented as a shield. An issuer is responsible for the truth of what it signs. An operator is responsible for publishing the record faithfully, including corrections and dispute outcomes. The evidence hashes, the dispute process and the erasure path exist because that responsibility is real, not as decoration.
 3. **On-chain notices become receipts.** When an issuer sends an on-chain notice to a wallet holding stolen funds, the notice transaction is logged. Anyone who later receives those funds can be shown to have had notice available — what victims' counsel need to argue knowing receipt, today reconstructed by hand.
 4. **Exchanges get bulk access by contributing.** An exchange gets the bulk feed only by filing its own confirmed scam deposit addresses and sweep mappings. The largest holders of safety data become its largest contributors, and the log fills the one gap every list has: which account the money finally reached.
 
@@ -64,7 +72,11 @@ Split the data in two. The **facts** go in a public, append-only log that anyone
 
 **Disputes:** a fixed window, an evidence standard, a panel that excludes the issuer; the outcome is itself a log entry. **Erasure:** a person who proves the address is theirs and the funds are clean gets a superseding entry and, where the law requires it, removal of identifiers. **Suspension:** an issuer whose claims keep losing disputes loses its authority; only the root body can grant or remove it, and its decisions are logged too.
 
+The window is thirty days from filing, shortened to seven where the claim is attached to funds still moving. A dispute pauses nothing by itself; it marks the claim as disputed in the record, and consumers set their own policy for disputed claims. The panel decides within thirty days of the window closing. Every step is an entry.
+
 ### How it is paid for
+
+Filing fees will not fund this at the start, and the table below describes the steady state, not the launch. The bootstrap is a subsidy: public-goods grants and recovery pledges from firms that expect to use the record, covering operator costs and dispute panels for the first two years, with the amounts and the funders published. The log runs at a loss while it proves itself. That is stated here because a funding model that only works on paper is how the earlier lists died quietly.
 
 | Layer | Free to | Paid by |
 |---|---|---|
@@ -89,7 +101,7 @@ Nothing here is invented. Each piece has run for a decade or more somewhere else
 
 ## Part 3 · What — DRAFT
 
-The concrete thing we propose to build, written as a first draft so it can be argued with line by line. Everything in this part is open to change in v0.2.
+The concrete thing we propose to build, written as a first draft so it can be argued with line by line. Everything in this part is open to change in v0.4.
 
 ### The claim record
 
@@ -118,12 +130,32 @@ One schema, versioned, signed. Addresses and hashes are illustrative.
 
 Deliberately absent: any name, any KYC identifier, any statement about who controls the address. The record is about a transaction and the money in it.
 
+### The confidence rubric
+
+A confidence score is only useful if two issuers mean roughly the same thing by it. The rubric below is a first draft; the evidence standard, once set by the root body, owns it.
+
+| Score | Meaning |
+|---|---|
+| 9–10 | Filed in or referenced by a court proceeding or a law-enforcement report, with the full evidence bundle hashed into the claim. |
+| 7–8 | Investigator trace plus a victim statement, both hashed. Two independent sources agree on the flow of funds. |
+| 5–6 | A single credible source: a trace or a victim statement with supporting records, hashed. |
+| 3–4 | A report with partial corroboration. Published, but no consumer should hard-stop on it alone. |
+| 1–2 | Uncorroborated. Reserved for notice-delivered records and early warnings clearly labelled as such. |
+
+An issuer whose scores repeatedly fail to match outcomes in disputes is miscalibrated, and miscalibration is a ground for suspension, the same as filing without evidence.
+
 ### The log
 
 - **Structure.** An append-only Merkle log, one entry per claim, with a signed tree head published by each operator at a fixed interval.
 - **Operators.** Three at launch, independent of each other and of Infinihash: a university host, a security collective, an exchange. Each runs the reference implementation or its own.
 - **Monitors.** Anyone can run one; it fetches tree heads from every operator and alarms on divergence. Infinihash will run one; so should at least one party that distrusts Infinihash.
 - **Retention.** Forever. Erasure replaces identifiers with a redaction marker and a reason; the entry and its hash chain remain.
+
+### Governance at the start, stated plainly
+
+At launch, Infinihash holds the root: it accredits the first issuers against the published evidence standard and can suspend them. That is centralisation, and pretending otherwise would cost more trust than admitting it.
+
+The exit is part of the design, not a promise about intentions. Every accreditation and suspension decision is a public log entry from day one, so the record of how the root was used exists whether or not Infinihash keeps it. The root passes to a body with at least three members, no one of them Infinihash, when two conditions are met: three independent operators are live, and at least five accredited issuers are filing. Until then, Infinihash publishes each quarter how many operators and issuers are live, so progress toward the handoff can be checked by anyone. A single owner is a paywall waiting to happen; a temporary steward with published conditions is a bootstrap.
 
 ### The lookup
 
@@ -146,9 +178,9 @@ The reference wallet integration shows one line when a destination matches: *"Th
 4. No statement about any named person, ever. Claims are about transactions.
 5. Every decision that affects an entry (accept, dispute, suspend, erase) is itself a public entry.
 
-### The reciprocity agreement, in one paragraph
+### The reciprocity agreement, in two steps
 
-An exchange that wants the bulk feed signs one agreement: it files, as an accredited issuer, every deposit address it has itself confirmed as receiving scam or theft proceeds, together with the sweep mapping from that deposit address to its hot wallet, within a fixed number of days of confirmation. In return it receives the full log as a feed, with a service level. It pays no licence fee. If it stops filing, the feed stops.
+An exchange that wants the bulk feed signs one agreement, in two steps. Step one: it files, as an accredited issuer, every deposit address it has itself confirmed as receiving scam or theft proceeds, within a fixed number of days of confirmation. In return it receives the full log as a feed, with a service level, and pays no licence fee. Step two, once it has seen the feed's value: it adds the sweep mapping from each deposit address to its hot wallet, the record no single list has today. If it stops filing, the feed stops. The first step is deliberately cheap to accept; dependence on the feed is what makes the second step reasonable.
 
 ### The first ninety days
 
@@ -167,7 +199,9 @@ An exchange that wants the bulk feed signs one agreement: it files, as an accred
 
 **Infinihash** builds the reference implementation and acts as first issuer. It will not own the log. A single owner is a paywall waiting to happen.
 
-### Open questions for v0.2
+One interest, stated plainly: Infinihash intends to sell judgements built on top of this log. That is the business the log makes possible, for Infinihash and for every other vendor. The log is structured so that it never needs Infinihash to survive: independent operators, public monitors, and a root that leaves on published conditions. Judge the structure, not the motive.
+
+### Open questions for v0.4
 
 - Will exchanges accept reciprocity? No precedent for exchanges jointly funding an open fraud feed was found.
 - How is the recovery pledge structured so it is not a recovery service in the regulatory sense?
