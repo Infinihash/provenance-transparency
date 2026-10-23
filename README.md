@@ -1,6 +1,6 @@
 # Provenance Transparency: crypto safety data without a paywall
 
-**Status:** request for comment, v0.1 (October 2026). Comments are open until 30 November 2026 in this repository's Discussions, or by email to hello@infinihash.com. A revised v0.2 will say what changed, why, and who argued for it.
+**Status:** request for comment, v0.2 draft (October 2026). Comments are open until 30 November 2026 in this repository's Discussions, or by email to hello@infinihash.com. A revised v0.2 will say what changed, why, and who argued for it.
 
 **Read:** the [web page](https://kyt.infinihash.com/provenance) · the [one-page brief (PDF)](onepager.pdf) · this document, the full proposal.
 
@@ -8,68 +8,166 @@
 
 ---
 
-Proposal, Oct 22, 2026. Built on two research notes in this repository: [research/landscape.md](research/landscape.md) (who sells crypto safety data, and what the free lists did) and [research/models.md](research/models.md) (how other industries made abuse data a public good). Both mark each claim [V] verified, [M] from memory or [B] background knowledge. Several funding and legal figures are [M]/[B]: treat them as leads to check, not facts, and tell us where they are wrong.
+Proposal, Oct 22–23, 2026. Built on two research notes in this repository: [research/landscape.md](research/landscape.md) (who sells crypto safety data, and what the free lists did) and [research/models.md](research/models.md) (how other industries made abuse data a public good). Both mark each claim [V] verified, [M] from memory or [B] background knowledge. Several funding and legal figures are [M]/[B]: treat them as leads to check, not facts, and tell us where they are wrong.
 
-## 1. The problem, stated precisely
+## Part 1 · Why
 
-Crypto safety data is paywalled because the paid product and the public good are the same thing: **labels**. Vendors sell "this address is bad" to exchanges at $26k–$295k a year, labels carry defamation liability, and so nobody publishes them. The free sources that exist are funnels (Chainabuse: 10 API calls a month, data owned by TRM), throttled (Etherscan labels are an enterprise product), or dead (CryptoScamDB, the Etherscan-scrape repos) because they had no revenue and no trust layer. The result is what this case showed: a ring with ~46 thefts and $16M of proceeds, and almost none of its wallets carried a public warning until a victim's team filed them by hand.
+Someone is about to send money to a wallet that received stolen funds last week. The fact that it did is known. It sits in a database that an exchange compliance team pays five or six figures a year to query. The person with their finger on Send does not have that database. Their wallet does not have it. The scam-report site they might check allows ten lookups a month on a free key. So the warning exists, and the one person who needed it never sees it.
 
-Every other industry that solved this did it by **splitting facts from judgments**: Certificate Transparency publishes certificates, not "this CA is bad"; CVE publishes vulnerability records, not "don't buy this software"; Spamhaus publishes evidence-backed listings with a dispute path. The verdict is made by the consumer (browser, scanner, mail server) under its own policy. That split is what moves the liability off the publisher and makes the data safe to give away.
+That is the whole problem, and it is a market structure, not a technical gap. Three things hold it in place.
 
-## 2. The design in one paragraph
+- **Labels are the product.** Every forensics vendor sells the same thing: a list of addresses and what they are. Publish the list and the business is gone. No vendor will do it, and no one should expect them to.
+- **A label is a liability.** "This wallet is a scammer" is a statement about a person. Get it wrong and you are sued. The vendors carry that risk behind contracts and indemnities; a free list has nothing behind it, so a free list says nothing, or says it recklessly.
+- **The free lists that were tried died.** No revenue, no trust layer, no reason for anyone to keep writing. Bots and recovery scammers poisoned the open ones; the curated ones went quiet when the one volunteer moved on. Each failure is now cited as proof that open safety data cannot work.
 
-A **public, append-only transparency log of evidenced provenance claims** ("funds from tx X at address Y are proceeds of incident Z; evidence hashes; issuer; confidence; time"), run by several independent operators, **free to read forever**, written to by **accredited issuers** with scoped authority, with CVE-style DISPUTED/WITHDRAWN states and a fixed-window dispute right. Wallets and individuals query it free through a privacy-preserving hash-prefix API. What stays commercial is everything *downstream* of the facts: risk scores, clustering, SLAs, bulk redistribution and legal-grade evidence packs. The log is the commons; the judgment is the market.
+Reported figures (third-party estimates, see research/landscape.md): vendor wallet labels run $26k–$295k a year; the largest free scam-report site allows 10 lookups a month on a standard key.
 
-## 3. What is new here (the five mechanisms that don't exist today)
+**Why it matters more than one theft.** In October 2026 a $1M proof-of-funds theft was traced across four chains. It belonged to a ring of about 46 thefts, about $16M, running since 2022. The trace mapped 102 wallets and 64 exchange accounts. Every exchange the ring used had bought the paid data. Almost none of the ring's wallets carried a public warning until the victim's team filed them, one form at a time, while the ring kept moving money through fresh addresses no form had reached yet. Multiply that by every ring. The data that would keep people safer already exists. It is priced for the wrong buyer.
 
-1. **Claims, not verdicts, on an append-only log.** Nothing in the log says "bad wallet". Every entry is a dated, signed, evidence-hashed *claim* that a specific transaction's outputs are proceeds of a specific incident, with a confidence. Corrections are new entries (DISPUTED, WITHDRAWN, SUPERSEDED), never deletions, so the record of what was claimed and when is itself public. This is the CT/CVE posture and it is the legal shield: the operator publishes what an accredited issuer attested, with the evidence attached, and the consumer decides what to do with it.
-2. **Proof-of-notice receipts.** Today's on-chain "dye packs" become first-class log entries: the notice text hash, the tx that delivered it, and the time. Any later holder of the same funds can be shown to have had notice *available* — the "knowing receipt" element victims' lawyers need. This gives the log a direct legal use for victims, which is a reason their counsel will pay **filing fees** to issue entries (court-filing economics), while reading stays free. In this case the broker's Oct 20 purchase, made after labels and notices were on the chain, is exactly the fact pattern the receipts would prove.
-3. **Reciprocity for institutions.** Exchanges and custodians get free bulk access *only if* they contribute their own confirmed-scam deposit addresses and sweep mappings (the VirusTotal model). The biggest data holders become contributors instead of customers, and the log fills in the one place current lists are blind: which exchange account received the money.
-4. **Recovery-funded endowment.** Issuers may attach an opt-in, counsel-administered pledge: a small percentage of any funds recovered on the back of a logged claim goes to the operator foundation. Funding then scales with the log's usefulness rather than with a sponsor's mood (the CVE funding scare of 2025 is the cautionary tale). Precedents to model: cy-près awards and whistleblower-award structures; this needs a lawyer's design.
-5. **A consumer bill of rights baked into the schema.** Free lookup of any address; a free dispute path with a fixed investigation window and an evidence standard for listing (the FCRA/CIFAS trade); addresses treated as pseudonymous identifiers with an erasure process for persons who prove innocence (the EDPB 2025 posture). The rights are what make the shield defensible.
+> The rule from every industry that beat abuse at scale: free for the people being protected, paid by the people making money from the data.
 
-## 4. Who pays, who reads free
+Spam blocklists, breach-notification services, certificate transparency, CVE: each publishes the evidence for free and lets a market sell the judgment on top. Crypto does it backwards. It sells the evidence. This proposal turns it the right way round.
+
+## Part 2 · How
+
+Split the data in two. The **facts** go in a public, append-only log that anyone can read for free, forever. The **judgments** stay with whoever is making the decision: the wallet, the exchange, the vendor. The log never says "bad wallet". It says "funds from this transaction are proceeds of this incident, here is the evidence, here is who says so and how sure they are." Everything below is a consequence of that split.
+
+| Facts: the log | Judgments: the market |
+|---|---|
+| Append-only, several independent operators, free to read | Each consumer applies its own policy to the same record |
+| An entry is a signed claim about a transaction: evidence hashes, issuer, confidence | A wallet may warn at confidence 6; an exchange may hold at 8 from two issuers |
+| Corrections are new entries (disputed, withdrawn, superseded); nothing is deleted | Scores, clustering, exposure, service levels stay commercial, built on top |
+
+### How a fact gets in
+
+1. **An accredited issuer files a claim.** Exchanges, forensics firms, police units and accredited victim-side investigators, each with scoped authority under a root body that sets the evidence standard and can suspend an issuer. Anyone can report; only an issuer can file. That is the trust layer the dead lists never had.
+2. **The claim carries evidence, not opinion.** Transaction hash, address, amount, incident reference, and hashes of the evidence bundle (victim statement, police reference, trace). Confidence is a number the issuer signs its name to. A claim with no evidence hashes is rejected at the door.
+3. **The issuer pays a filing fee.** Small, flat, per claim. It funds the operators and makes bulk poisoning expensive. Reading stays free. Victims' counsel will pay it gladly: a logged claim is the thing they need next.
+4. **Operators sign a receipt and monitors check them.** At least three independent operators (a university host, a security collective, an exchange) each sign the entry into their copy. Public monitors compare the copies; an operator that drops or alters an entry is caught by the other two. Certificate transparency, applied to stolen funds.
+
+### How a fact gets out
+
+1. **Wallets look up by hash prefix.** A wallet about to sign sends the first bytes of a hash of the destination address, gets back the matching bucket, checks locally. The log never learns which address was queried. Free at consumer volume; a paid tier for heavy commercial use.
+2. **The wallet applies its own policy.** The log returns claims, not verdicts. The wallet decides what to show. The policy, and the liability for it, sits with the wallet. That is the legal shield.
+3. **On-chain notices become receipts.** When an issuer sends an on-chain notice to a wallet holding stolen funds, the notice transaction is logged. Anyone who later receives those funds can be shown to have had notice available — what victims' counsel need to argue knowing receipt, today reconstructed by hand.
+4. **Exchanges get bulk access by contributing.** An exchange gets the bulk feed only by filing its own confirmed scam deposit addresses and sweep mappings. The largest holders of safety data become its largest contributors, and the log fills the one gap every list has: which account the money finally reached.
+
+### How it stays honest
+
+**Disputes:** a fixed window, an evidence standard, a panel that excludes the issuer; the outcome is itself a log entry. **Erasure:** a person who proves the address is theirs and the funds are clean gets a superseding entry and, where the law requires it, removal of identifiers. **Suspension:** an issuer whose claims keep losing disputes loses its authority; only the root body can grant or remove it, and its decisions are logged too.
+
+### How it is paid for
 
 | Layer | Free to | Paid by |
 |---|---|---|
-| The log itself (claims + evidence hashes + receipts), read access, monitors | Everyone: wallets, individuals, researchers, journalists, small exchanges | Operator foundation: issuer filing fees, institutional reciprocity dues, recovery pledges, public-goods grants |
-| Hash-prefix client API (Safe Browsing / HIBP style) | Wallets and apps at consumer volume | Volume tier for commercial heavy use (Spamhaus DQS model) |
-| Enrichment: clustering, risk scores, multi-hop exposure, case packs, SLAs | — | Commercial vendors (Infinihash KYT among them) built *on top of* the log |
-| Legal-grade evidence bundles for freezing orders | Victims at cost | Counsel; recoverable as costs |
+| The log, receipts, monitors | Everyone | Issuer filing fees, institutional reciprocity dues, recovery pledges, public-goods grants |
+| Hash-prefix lookup API | Wallets and apps at consumer volume | A volume tier for heavy commercial use |
+| Scores, clustering, exposure, SLAs | Nobody | Commercial vendors built on top of the log |
+| Legal-grade evidence bundles | Victims, at cost | Counsel; recoverable as costs |
 
-Rule of thumb from Spamhaus and HIBP: free for the people being protected, paid for the people making money from the data.
+One more source, opt-in and in need of legal structuring: an issuer may attach a pledge that a small share of funds recovered on a logged claim goes to the operator foundation. Funding then scales with usefulness, not with how many exchanges renew a licence.
 
-## 5. Governance (borrowed, not invented)
+### How it survives where the free lists died
 
-- **Operators:** at least three independent log operators (a university host like abuse.ch at BFH; a security collective such as SEAL; one exchange or custodian). Each signs receipts; monitors check they agree.
-- **Issuers (CNA model):** exchanges, forensics firms, law-enforcement units and accredited victim-side investigators, each with scoped authority (an exchange may attest only its own deposit addresses; a forensics firm may attest traced flows with evidence). A root body sets the evidence standard and can suspend an issuer.
-- **Policy stays with consumers:** a wallet may warn at confidence ≥6; an exchange may hold at ≥8 from two issuers. The log never blocks anything.
-- **Disputes:** fixed window (say 10 business days), evidence-based, resolved by a panel not including the issuer; outcomes are log entries.
-- **Legal posture:** evidenced reports of facts about transactions, never statements about named persons; Section 230(c)(2)-style good-faith filtering where it applies; GDPR process for identifiers.
+| What killed the open lists | What this has instead |
+|---|---|
+| No revenue path | Filing fees, reciprocity dues, recovery pledges, vendor service tiers; none from selling labels |
+| No trust layer; poisoned by bots and recovery scammers | Accredited issuers, an evidence standard, filing fees, disputes |
+| Nobody with a reason to keep writing | Victims' counsel, who need logged notice to prove knowing receipt |
+| Nobody with a reason to keep reading | Exchanges, who want the map of which accounts received the money |
+| A single owner who could quietly remove entries | Append-only, several operators, public monitors |
 
-## 6. Why it survives where CryptoScamDB didn't
+Nothing here is invented. Each piece has run for a decade or more somewhere else (Certificate Transparency operators and monitors; CVE numbering authorities; Spamhaus's free/paid split; credit-fraud consortia's consumer rights). The new part is combining them for stolen-funds provenance.
 
-- It has **revenue that doesn't depend on selling labels**: filing fees, reciprocity dues, pledges, enrichment vendors paying for feed SLAs.
-- It has a **trust layer** (accredited issuers, evidence standard, disputes), so it isn't poisoned by the address-poisoning bots and recovery scammers that drown open report sites.
-- It has **users with a legal reason to write to it** (victims' counsel) and institutions with a **business reason to read it** (exchanges want the deposit-address map).
-- It **cannot be quietly censored**: append-only, multi-operator, monitored.
+## Part 3 · What — DRAFT
 
-## 7. What Infinihash's role would be
+The concrete thing we propose to build, written as a first draft so it can be argued with line by line. Everything in this part is open to change in v0.2.
 
-Reference implementation and first issuer, first commercial enrichment vendor on top, and the convener of the first two outside operators. Not the sole operator and not the owner: the moment one company owns the log, it's a paywall waiting to happen.
+### The claim record
 
-## 8. Bootstrap (90 days)
+One schema, versioned, signed. Addresses and hashes are illustrative.
 
-1. Publish the schema and the consumer rights document; recruit two outside operators (a university, SEAL or a comparable body).
-2. Seed the log: this case's 102 tier-A wallets and 64 exchange accounts, ScamSniffer's open blocklist (licence permitting), the OFAC SDN crypto addresses.
-3. Ship the hash-prefix lookup API and a MetaMask/Rabby-style warning integration.
-4. Sign the first reciprocity agreement with one exchange (the deposit-address map is the carrot).
-5. Run the first dispute end-to-end on a deliberately weak entry, publicly.
+```jsonc
+// provenance claim, schema v0.1 (draft)
+{
+  "claim_id":   "pt:2026-10-22:000418",
+  "kind":       "proceeds_of_theft",   // | proceeds_of_fraud | notice_delivered | dispute | withdrawal
+  "incident":   "inc-2026-1014-pof",
+  "chain":      "ethereum",
+  "tx":         "0x3c54…5cb0",
+  "address":    "0xa91c…6f43",
+  "amount":     {"asset": "USDT", "value": "1000000.79"},
+  "evidence":   ["sha256:9f2c…e41a", "sha256:71bd…0c88"],
+  "issuer":     "did:issuer:accredited-0007",
+  "confidence": 8,                     // 1–10, signed by the issuer
+  "status":     "active",              // active | disputed | withdrawn | superseded
+  "supersedes": null,
+  "notice_tx":  "0xad19…b6f8",          // on-chain notice delivered, if any
+  "issued_at":  "2026-10-22T17:46:53Z",
+  "signature":  "ed25519:…"
+}
+```
 
-## 9. Open questions (check before any public claim)
+Deliberately absent: any name, any KYC identifier, any statement about who controls the address. The record is about a transaction and the money in it.
 
+### The log
+
+- **Structure.** An append-only Merkle log, one entry per claim, with a signed tree head published by each operator at a fixed interval.
+- **Operators.** Three at launch, independent of each other and of Infinihash: a university host, a security collective, an exchange. Each runs the reference implementation or its own.
+- **Monitors.** Anyone can run one; it fetches tree heads from every operator and alarms on divergence. Infinihash will run one; so should at least one party that distrusts Infinihash.
+- **Retention.** Forever. Erasure replaces identifiers with a redaction marker and a reason; the entry and its hash chain remain.
+
+### The lookup
+
+```text
+GET  /v1/lookup/{chain}/{sha256_prefix_4_bytes}   # k-anonymity: the log never sees the address
+  -> { "bucket": [ { "address_hash": "sha256:…", "claims": [claim_id, …], "max_confidence": 8 }, … ] }
+GET  /v1/claim/{claim_id}                          # full record, free
+GET  /v1/incident/{incident_id}                    # all claims under one incident
+POST /v1/claim                                     # issuers only, signed, filing fee
+POST /v1/dispute/{claim_id}                        # anyone, with evidence; opens the window
+```
+
+The reference wallet integration shows one line when a destination matches: *"This address received funds that an accredited issuer has logged as proceeds of theft (confidence 8 of 10, incident inc-2026-1014). Continue?"* The wallet chooses the threshold and the wording. The log supplies only the fact.
+
+### The consumer bill of rights
+
+1. Free lookup of any address, by anyone, with no account.
+2. A free dispute, with a fixed window and a published evidence standard, decided by a panel that excludes the issuer.
+3. Erasure of identifiers for a person who proves innocence, logged as a superseding entry.
+4. No statement about any named person, ever. Claims are about transactions.
+5. Every decision that affects an entry (accept, dispute, suspend, erase) is itself a public entry.
+
+### The reciprocity agreement, in one paragraph
+
+An exchange that wants the bulk feed signs one agreement: it files, as an accredited issuer, every deposit address it has itself confirmed as receiving scam or theft proceeds, together with the sweep mapping from that deposit address to its hot wallet, within a fixed number of days of confirmation. In return it receives the full log as a feed, with a service level. It pays no licence fee. If it stops filing, the feed stops.
+
+### The first ninety days
+
+1. Publish the schema and the consumer rights; recruit two outside operators.
+2. Seed the log from the anonymised October 2026 case and from open blocklists whose licences permit it.
+3. Ship the hash-prefix lookup API and one wallet warning integration.
+4. Sign the first reciprocity agreement with one exchange.
+5. Run the first dispute end to end, in public.
+
+### What we are asking for
+
+- Two independent operators: a university or a security collective, and an exchange.
+- One exchange willing to be the first reciprocity signatory.
+- Public-goods funding for the bootstrap, so no single company pays for the log and therefore owns it.
+- Argument. The open questions below are the ones we most want challenged.
+
+**Infinihash** builds the reference implementation and acts as first issuer. It will not own the log. A single owner is a paywall waiting to happen.
+
+### Open questions for v0.2
+
+- Will exchanges accept reciprocity? No precedent for exchanges jointly funding an open fraud feed was found.
+- How is the recovery pledge structured so it is not a recovery service in the regulatory sense?
+- Wallet addresses as personal data under the 2025 EDPB guidelines; the shape of the erasure process.
+- The status of information-sharing safe harbours in the US and UK.
+- The right size of a filing fee: enough to deter poisoning, not enough to deter small victims' counsel.
 - Verify the funding figures and licence terms marked [M]/[B] in [research/](research/).
-- Whether the US CISA 2015 sharing safe harbour was reauthorised after its Sept 2025 lapse, and the CVE contract status after March 2026.
-- The exact EDPB wording on wallet addresses as personal data, and what an erasure process must look like.
-- Whether a recovery pledge can be structured without becoming a "recovery service" in the regulatory sense; counsel to design it.
-- Whether exchanges will accept reciprocity; no precedent for exchanges jointly funding an open fraud feed was found.
+
+## Discuss
+
+Comments are open until 30 November 2026 in [Discussions](https://github.com/Infinihash/provenance-transparency/discussions) (thread #1) or by email to hello@infinihash.com. Say whether we may quote you. v0.2 will say what changed, why, and who argued for it.
